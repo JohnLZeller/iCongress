@@ -55,7 +55,7 @@
     <ul class="nav navbar-nav navbar-right">
       <li>
         {% if current_user.is_authenticated() %}
-          <li><a href="profile">Welcome{% if current_user.firstname %}, {{ current_user.firstname }} {{ current_user.lastname }}{% endif %}!</a></li>
+          <li><a href="profile"><img src={{ current_user.email | gravatar(size=20) }} class="img-rounded">  Welcome{% if current_user.firstname %}, {{ current_user.firstname }} {{ current_user.lastname }}{% endif %}!</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle btn btn-default btn-lg hide-button cog" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <b class="caret"></b></a>
             <ul class="dropdown-menu">
@@ -74,7 +74,19 @@
 </nav>
 
 
-  {% block body %}{% endblock %}
+  {% block body %}
+    {% if alert_success %}
+      <div class="alert alert-success alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <strong>Success!</strong> Your profile has been updated :)
+      </div>
+    {% elif alert_failure %}
+      <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <strong>Oh Crap!</strong> Something went wrong and your profile was not updated :(
+      </div>
+      {% endif %}
+  {% endblock %}
 
   <div class="container">
     <hr>

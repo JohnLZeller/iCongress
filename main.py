@@ -5,7 +5,10 @@ import time
 from flask.ext.login import LoginManager, UserMixin, current_user
 from flaskext.browserid import BrowserID
 from flask.ext.sqlalchemy import SQLAlchemy
+from flaskext.gravatar import Gravatar
 from pprint import pprint
+from hashlib import md5
+from datetime import datetime
 
 ## SETUP
 DEBUG = True
@@ -49,6 +52,15 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+gravatar = Gravatar(app,
+                    size=100,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False,
+                    use_ssl=False,
+                    base_url=None)
 
 ### Login Functions ###
 def get_user_by_id(id):
@@ -101,7 +113,7 @@ def home():
 @app.route('/editprofile', methods=['GET', 'POST'])
 def editprofile():
     if current_user.is_authenticated():
-        error = None
+        email = md5(current_user.email).hexdigest()
         if request.method == 'POST':
             user = get_user({"email": current_user.email})
             id = user.id
@@ -116,14 +128,24 @@ def editprofile():
             try:
                 db.session.commit()
             except:
-                return render_template('editprofile.html', alert_failure=True)
-            return render_template('editprofile.html', alert_success=True)
-        return render_template('editprofile.html')
+                return render_template('editprofile.html', alert_failure=True, email=email)
+            return render_template('editprofile.html', alert_success=True, email=email)
+        return render_template('editprofile.html', email=email)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if current_user.is_authenticated():
+        if request.method == 'POST':
+            user = get_user({"email": current_user.email})
+            id = user.id
+            user = User.query.get(id)
+            if request.form.get('email') != u'': user.email = request.form.get('email')
+            try:
+                db.session.commit()
+            except:
+                return render_template('settings.html', alert_failure=True)
+            return render_template('settings.html', alert_success=True)
         return render_template('settings.html')
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
@@ -160,7 +182,7 @@ def blog():
 @app.route('/profile')
 def profile():
     if current_user.is_authenticated():
-        return render_template('profile.html')
+        return render_template('profile.html', date_register = datetime.fromtimestamp(int(current_user.date_register)).strftime('%m/%d/%Y at %H:%M:%S'))
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 ### Admin Tools ###

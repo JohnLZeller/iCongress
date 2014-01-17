@@ -4,22 +4,12 @@
   <div class="jumbotron">
   	<div class="container">
       <h1>Edit Profile</h1>
-      {% if alert_success %}
-        <div class="alert alert-success alert-dismissable">
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          <strong>Success!</strong> Your profile has been updated :)
-        </div>
-      {% elif alert_failure %}
-        <div class="alert alert-danger alert-dismissable">
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          <strong>Oh Crap!</strong> Something went wrong and your profile was not updated :(
-        </div>
-      {% endif %}
     </div>
     <div class="container signup_form_wrapper">
       <form role="form" action="editprofile" method=post>
         <div class="form-group">
-          <input type=text name=image placeholder="Image" class="form-control">
+          <a href={{ "http://www.gravatar.com/" + email }} target="_blank"><img src={{ current_user.email | gravatar(size=200) }} class="img-thumbnail"></a>
+          <a href={{ "http://www.gravatar.com/" + email }} target="_blank">Change your avatar at Gravatar.com</a>
         </div>
         <div class="form-group">
           <input type=text name=firstname placeholder={% if current_user.firstname %} {{ current_user.firstname }} {% else %}"First Name"{% endif %} class="form-control">

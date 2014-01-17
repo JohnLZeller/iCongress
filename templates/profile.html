@@ -3,10 +3,23 @@
 	<!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <div class="container" style="padding-top: 30px;">
-      <h1>Profile</h1>
+      <div class="row">
+        <div class="col-md-4"><img src={{ current_user.email | gravatar(size=200) }} class="img-thumbnail"></div>
+      </div>
+      <div class="row">
+        <div style="margin-top: -210px;" class="col-md-8 col-md-offset-3">
+          <address>
+            <h2>{{ current_user.firstname  }}  {{ current_user.lastname }}</h2>
+            <strong>Registered: </strong><small>{{ date_register }}</small><br>
+            <strong>Location: </strong><small>{% if current_user.state %}{{ current_user.city }}, {{ current_user.state }}{% else %}Somewhere{% endif %}</small><br>
+            <strong>Email: </strong><small>{{ current_user.email }}</small><br>
+            <strong>Facebook: </strong><small><a href={{ current_user.facebook }} target="_blank">{{ current_user.facebook }}</a></small><br>
+            <strong>Twitter: </strong><small><a href={{ current_user.twitter }} target="_blank">{{ current_user.twitter }}</a></small><br>
+            <strong>Website: </strong><small><a href={{ current_user.website }} target="_blank">{{ current_user.website }}</a></small><br>
+            <strong>Bio: </strong><small>{{ current_user.bio }}</small><br>
+          </address>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div class="container">
   </div>
 {% endblock %}
