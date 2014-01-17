@@ -6,14 +6,15 @@ A Flask web app that allows users to see how their voting would match up with re
 # Dependencies
 * [Flask](http://flask.pocoo.org/)
 * Flask Extensions - more found [here](http://flask.pocoo.org/extensions/)
-** [Flask-Login](https://flask-login.readthedocs.org/en/latest/)
-** [Flask-BrowserID (Mozilla Persona)](https://github.com/garbados/flask-browserid)
-** [Flask-SQLAlchemy](http://pythonhosted.org/Flask-SQLAlchemy/)
-** [Flask-Gravatar](http://pythonhosted.org/Flask-Gravatar/)
+  * [Flask-Login](https://flask-login.readthedocs.org/en/latest/)
+  * [Flask-BrowserID (Mozilla Persona)](https://github.com/garbados/flask-browserid)
+  * [Flask-SQLAlchemy](http://pythonhosted.org/Flask-SQLAlchemy/)
+  * [Flask-Gravatar](http://pythonhosted.org/Flask-Gravatar/)
 In order to install all of these dependancies run this:
-'''
+
+```bash
 pip install Flask
 pip install flask-login
 pip install git+https://github.com/garbados/flask-browserid.git
 pip install Flask-Gravatar
-'''
+```
