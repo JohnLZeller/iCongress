@@ -5,6 +5,14 @@ In a world filled with misinformation, talking heads and inflated egos, it can b
 # What is this?
 A Flask web app that allows users to see how their voting would match up with real members of Congress!
 
+# Setting up the SQLite Database
+Open up a terminal and navigate to the iCongress base directory:
+```python
+python
+>>> from main import db
+>>> db.create_all()
+'''
+
 # Dependencies
 * [Flask](http://flask.pocoo.org/)
 * Flask Extensions - more found [here](http://flask.pocoo.org/extensions/)
