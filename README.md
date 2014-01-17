@@ -11,7 +11,7 @@ Open up a terminal and navigate to the iCongress base directory:
 python
 >>> from main import db
 >>> db.create_all()
-'''
+```
 
 # Dependencies
 * [Flask](http://flask.pocoo.org/)
