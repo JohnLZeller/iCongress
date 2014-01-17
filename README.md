@@ -13,6 +13,9 @@ python
 >>> db.create_all()
 ```
 
+# Useful Development Tools
+* [SQLite-Manager (Firefox Add-On)](https://code.google.com/p/sqlite-manager/)
+
 # Dependencies
 * [Flask](http://flask.pocoo.org/)
 * Flask Extensions - more found [here](http://flask.pocoo.org/extensions/)
