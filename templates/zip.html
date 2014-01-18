@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+	<!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <div class="container" style="padding-top: 30px;">
+      <h1>Dashboard</h1>
+	    <div class="container signup_form_wrapper">
+	    For fun let's see who your members of Congress are!<br>
+      	<table>
+        {% for member in data['results'] %}
+            <tr><td><h1>{{ member["title"] }} {{ member["first_name"] }} {% if member["middle_name"] %}{{ member["middle_name"] }}{% endif %}{{ member["last_name"] }} {% if member["name_suffix"] %}{{ member["name_suffix"] }}{% endif %}</h1></td></tr>
+      		{% for item in keyPreferredOrder %}
+            <tr><td><strong>{{ keyLookup(item) }}: </strong>{{ member[item] }}</td></tr>
+          {% endfor %}
+      	{% endfor %}
+        </table>
+	    </div>
+    </div>
+  </div>
+
+  <div class="container">
+  </div>
+{% endblock %}

@@ -9,6 +9,8 @@ from flaskext.gravatar import Gravatar
 from pprint import pprint
 from hashlib import md5
 from datetime import datetime
+import urllib2
+import json
 
 ## SETUP
 DEBUG = True
@@ -103,11 +105,97 @@ browserid = BrowserID()
 browserid.user_loader(get_user)
 browserid.init_app(app)
 
+## Sunlight Labs Setup ##
+apiKey = "apikey=578f15b9d3a44ebb8c829860d609bba8"
+apiAddr = "http://congress.api.sunlightfoundation.com/"
+leglookup = "legislators/locate"
+keyPreferredOrder = [# Name and Title
+            #'first_name', 
+            #'middle_name', 
+            #'last_name', 
+            #'name_suffix', 
+            #'title', 
+            # Personal Info
+            'gender', 
+            'birthday', 
+            'nickname', 
+            # Congressional Info
+            'party', 
+            'chamber', 
+            'senate_class', 
+            'in_office', 
+            'state', 
+            'state_name',
+            'state_rank', 
+            'district', 
+            # Contact Info
+            'office', 
+            'phone', 
+            'fax', 
+            'website', 
+            'contact_form', 
+            'twitter_id', 
+            'facebook_id', 
+            'youtube_id',
+            # IDs
+            'crp_id', 
+            'fec_ids', 
+            'votesmart_id', 
+            'lis_id', 
+            'govtrack_id', 
+            'bioguide_id', 
+            'thomas_id', ]
+
+def keyLookup(key):
+    keyDic =   {'last_name': 'Last Name',
+                'state_name': 'State Name',
+                'office': 'Office',
+                'fax': 'Fax Number',
+                'thomas_id': 'Thomas ID',
+                'first_name': 'First Name',
+                'middle_name': 'Middle Name',
+                'district': 'District',
+                'senate_class': 'Senate Class',
+                'in_office': 'In Office',
+                'state': 'Name',
+                'crp_id': 'CRP ID',
+                'facebook_id': 'Facebook',
+                'party': 'Party',
+                'fec_ids': 'FEC IDs',
+                'votesmart_id': 'Votesmart ID',
+                'website': 'Website',
+                'lis_id': 'LIS ID',
+                'govtrack_id': 'GovTrack ID',
+                'phone': 'Phone Number',
+                'birthday': 'Birthday',
+                'nickname': 'Nickname',
+                'contact_form': 'Contact Form',
+                'bioguide_id': 'Bioguide ID',
+                'gender': 'Gender',
+                'title': 'Title',
+                'name_suffix': 'Name Suffix',
+                'twitter_id': 'Twitter',
+                'chamber': 'Chamber',
+                'state_rank': 'State Rank',
+                'youtube_id': 'YouTube'}
+    return keyDic[key]
+
 ### Routing ###
 @app.route('/')
 def home():
     if current_user.is_authenticated():
-        return render_template('dashboard.html', users_fullname=str(current_user.firstname) + " " + str(current_user.lastname))
+        return render_template('dashboard.html')
+    return render_template('index.html')
+
+@app.route('/zip', methods=['GET', 'POST'])
+def zip():
+    if current_user.is_authenticated():
+        if request.method == 'POST':
+            req = apiAddr + leglookup + "?" + apiKey + "&zip=" + request.form.get('zipcode')
+            req = urllib2.urlopen(req).read()
+            data = json.loads(req)
+            pprint(data)
+        return render_template('zip.html', data=data, keyPreferredOrder=keyPreferredOrder, keyLookup=keyLookup)
     return render_template('index.html')
 
 @app.route('/editprofile', methods=['GET', 'POST'])
