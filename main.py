@@ -43,10 +43,9 @@ class User(UserMixin, db.Model):
     facebook = db.Column(db.Unicode(1000))
     twitter = db.Column(db.Unicode(1000))
     website = db.Column(db.Unicode(1000))
-    image = db.Column(db.LargeBinary)
 
     def __init__(self, email, firstname=None, lastname=None, date_register=None, bio=None, address=None, city=None, 
-                    state=None, country=None, zipcode=None, facebook=None, twitter=None, website=None, image=None):
+                    state=None, country=None, zipcode=None, facebook=None, twitter=None, website=None):
         self.email = email
         self.firstname = firstname
         self.lastname = lastname
@@ -60,7 +59,6 @@ class User(UserMixin, db.Model):
         self.facebook = facebook
         self.twitter = twitter
         self.website = website
-        self.image = image
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -164,7 +162,11 @@ def zip():
             user = get_user({"email": current_user.email})
             id = user.id
             user = User.query.get(id)
-            if request.form.get('zipcode') != u'': user.zipcode = request.form.get('zipcode')
+            user.zipcode = request.form.get('zipcode')
+            try:
+                db.session.commit()
+            except:
+                return render_template('dashboard.html', alert_failure=True)
             req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
             req = urllib2.urlopen(req).read()
             data = json.loads(req)
