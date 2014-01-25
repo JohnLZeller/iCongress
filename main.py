@@ -163,7 +163,7 @@ def zip():
             req = urllib2.urlopen(req).read()
             data = json.loads(req)
             data = add_images(data)
-        return render_template('zip.html', data=data, timestamp_prettify=timestamp_prettify)
+        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify)
     return render_template('index.html')
 
 @app.route('/editprofile', methods=['GET', 'POST'])

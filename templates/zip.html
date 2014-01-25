@@ -24,6 +24,13 @@
       <div class="col-md-1 border-vertical"></div>
       <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
         <h3 class="text-center"><strong>My Members of Congress</strong></h3>
+        <form class="form-inline zipcode" role="form" action="zip" method=post>
+          <div class="form-group">
+            <input type=text name=zipcode placeholder="Zipcode" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-success">Update</button>
+        </form>
+
         {% for member in data['results'] %}
           {% include "congress_badge.html" %}
         {% endfor %}

@@ -7,6 +7,9 @@
  * Notes:
  * =============================================================*/
 
+html{min-height:100%;position:relative}/* make sure it is at least as tall as the viewport */
+body{height:100%}
+
 /* ==================== TYPOGRAPHY ==================== */
 .signup_form_wrapper {
 	padding-top: 20px;
@@ -48,9 +51,18 @@
 }
 
 .dashboard {
-	padding-top: 30px;
+	padding-top: 20px;
 	padding-left: 42px;
 	padding-right: 42px;
+    display: table;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.dashboard-row {
+    height: 100%;
+    display: table-row;
 }
 
 .dashboard-menu {
@@ -58,6 +70,7 @@
 	padding: 0px;
 	border-radius: 0px;
     display: table;
+    margin-top: 10px;
 }
 
 .dashboard-menu a {
@@ -85,8 +98,13 @@
     display: table-row;
 }
 
+.timeline {
+	padding-top: 10px;
+}
+
 .local-congress {
 	padding-right: 0px;
+    margin-top: 10px;
 }
 
 .congress-badge {
@@ -146,14 +164,15 @@
 }
 
 .border-vertical {
-	width: 0px;
-	padding: 0px 0px 0px 0px;
-	margin: -10px 0px 0px -2px;
 	border-left: 2px solid #000;
-	height:500px;
+	border-right: 2px solid #000;
 }
 
 .border-horizontal {
 	border-left: 2px solid #000;
 	width: 80%;
+}
+
+.zipcode {
+	padding: 10px;
 }

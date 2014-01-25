@@ -1,21 +1,41 @@
 {% extends "layout.html" %}
 {% block body %}
-	<!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
-    <div class="container" style="padding-top: 30px;">
-      <h1>Dashboard</h1>
-	    <div class="container signup_form_wrapper">
-	      For fun let's see who your members of Congress are!
-	      <form role="form" action="zip" method=post>
-	        <div class="form-group">
-	          <input type=text name=zipcode placeholder="Zipcode" class="form-control">
-	        </div>
-	        <button type="submit" class="btn btn-success">Submit</button>
-	      </form>
-	    </div>
-    </div>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
   </div>
-
-  <div class="container">
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      <div class="col-md-2 dashboard-menu"> <!-- Dashboard Menu -->
+        <a href="vote" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-ok-sign"></span><span class="tab" />Go Vote
+        </a>
+        <a href="votingrecord" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-list"></span><span class="tab" />My Voting History
+        </a>
+        <a href="compatibility" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-list-alt"></span><span class="tab" />Compatibility List
+        </a>
+      </div>
+      <div class="col-md-5 timeline dashboard-cell border-vertical"> <!-- Timeline -->
+        Stuff...<br><br>
+        Stuff...<br><br>
+      </div>
+      <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
+        <h3 class="text-center"><strong>My Members of Congress</strong></h3>
+        <form class="form-inline zipcode" role="form" action="zip" method=post>
+          <div class="form-group">
+            <input type=text name=zipcode placeholder="Zipcode" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-success">Update</button>
+        </form>
+        {% if data %}
+        	{% for member in data['results'] %}
+        		{% include "congress_badge.html" %}
+        	{% endfor %}
+        {% else %}
+        	<p>Please enter a zipcode to continue :)</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% endblock %}
