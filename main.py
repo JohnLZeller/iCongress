@@ -174,6 +174,31 @@ def zip():
         return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify)
     return render_template('index.html')
 
+@app.route('/allcongress', methods=['GET', 'POST'])
+def allcongress():
+    if current_user.is_authenticated():
+        if request.method == 'POST':
+            user = get_user({"email": current_user.email})
+            id = user.id
+            user = User.query.get(id)
+            user.zipcode = request.form.get('zipcode')
+            try:
+                db.session.commit()
+            except:
+                return render_template('allcongress.html', alert_failure=True)
+
+        req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
+        req = urllib2.urlopen(req).read()
+        data = json.loads(req)
+        data = add_images(data)
+
+        reqall = apiAddr + "legislators?" + apiKey + "&per_page=all"
+        reqall = urllib2.urlopen(reqall).read()
+        dataall = json.loads(reqall)
+        dataall = add_images(dataall)
+        return render_template('allcongress.html', data=data, dataall=dataall, timestamp_prettify=timestamp_prettify)
+    return render_template('index.html')
+
 @app.route('/editprofile', methods=['GET', 'POST'])
 def editprofile():
     if current_user.is_authenticated():

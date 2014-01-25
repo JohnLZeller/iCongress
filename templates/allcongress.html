@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block body %}
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
+  </div>
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      <div class="col-md-2 dashboard-menu"> <!-- Dashboard Menu -->
+        <a href="vote" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-ok-sign"></span><span class="tab" />Go Vote
+        </a>
+        <a href="votingrecord" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-list"></span><span class="tab" />My Voting History
+        </a>
+        <a href="compatibility" class="btn-lg dashboard-menu-button">
+          <span class="glyphicon glyphicon-list-alt"></span><span class="tab" />Compatibility List
+        </a>
+      </div>
+      <div class="col-md-5 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+        {% if dataall %}
+          {% for member in dataall['results'] %}
+            {% include "congress_badge.html" %}
+          {% endfor %}
+        {% else %}
+          <p>Please enter a zipcode to continue :)</p>
+        {% endif %}
+      </div>
+      <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
+        <h3 class="text-center"><strong>My Members of Congress</strong></h3>
+        <form class="form-inline zipcode" role="form" action="zip" method=post>
+          <div class="form-group">
+            <input type=text name=zipcode placeholder={% if current_user.zipcode %}{{ current_user.zipcode }}{% else %}"What's your zip?"{% endif %} class="form-control">
+          </div>
+          <button type="submit" class="btn btn-success">Change Zip</button>
+        </form>
+        {% if data %}
+        	{% for member in data['results'] %}
+        		{% include "congress_badge.html" %}
+        	{% endfor %}
+        {% else %}
+        	<p>Please enter a zipcode to continue :)</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
