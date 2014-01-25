@@ -1,10 +1,10 @@
 <div class="well well-sm congress-badge">
   <div class="media">
-    <div class="img-rounded media-object congress-badge-img pull-left" style="background-image: url('{{ member["img"] }}');"><img src={{ member["img"] }} /></div>
+    <div class="img-rounded media-object congress-badge-img pull-left" style="background-image: url('{{ member["img"] }}');"><a href="#"><img src={{ member["img"] }} /></a></div>
     <div class="media-body">
       <div class="media-body pull-left">
         <h4 class="media-heading">
-          <strong>{{ member["title"] }} {{ member["first_name"] }} {% if member["middle_name"] %}{{ member["middle_name"] }} {% endif %}{{ member["last_name"] }} {% if member["name_suffix"] %}{{ member["name_suffix"] }}{% endif %}</strong>
+          <strong><a href="#">{{ member["title"] }} {{ member["first_name"] }} {% if member["middle_name"] %}{{ member["middle_name"] }} {% endif %}{{ member["last_name"] }} {% if member["name_suffix"] %}{{ member["name_suffix"] }}{% endif %}</a></strong>
           <span class="tab congress-badge-blue">{{ member["party"] }}</span>
           <span class="congress-badge-info">- {{ member["state"] }}</span>
         </h4>

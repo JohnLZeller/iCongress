@@ -149,17 +149,23 @@ def timestamp_prettify(timestamp):
 @app.route('/')
 def home():
     if current_user.is_authenticated():
-        return render_template('dashboard.html')
+        req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
+        req = urllib2.urlopen(req).read()
+        data = json.loads(req)
+        data = add_images(data)
+        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify)
     #lat_long = get_lat_long(request.remote_addr)
-    #print "Lat: " + str(lat_long['latitude']) + " - Long: " + str(lat_long['longitude'])
-    #print lat_long
     return render_template('index.html')
 
 @app.route('/zip', methods=['GET', 'POST'])
 def zip():
     if current_user.is_authenticated():
         if request.method == 'POST':
-            req = apiAddr + leglookup + "?" + apiKey + "&zip=" + request.form.get('zipcode')
+            user = get_user({"email": current_user.email})
+            id = user.id
+            user = User.query.get(id)
+            if request.form.get('zipcode') != u'': user.zipcode = request.form.get('zipcode')
+            req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
             req = urllib2.urlopen(req).read()
             data = json.loads(req)
             data = add_images(data)

@@ -18,6 +18,21 @@
           <input type=text name=lastname placeholder={% if current_user.lastname %} {{ current_user.lastname }} {% else %}"Last Name"{% endif %} class="form-control">
         </div>
         <div class="form-group">
+          <input type=text name=address placeholder={% if current_user.address %} {{ current_user.address }} {% else %}"Address"{% endif %} class="form-control">
+        </div>
+        <div class="form-group">
+          <input type=text name=city placeholder={% if current_user.city %} {{ current_user.city }} {% else %}"City"{% endif %} class="form-control">
+        </div>
+        <div class="form-group">
+          <input type=text name=state placeholder={% if current_user.state %} {{ current_user.state }} {% else %}"State"{% endif %} class="form-control">
+        </div>
+        <div class="form-group">
+          <input type=text name=country placeholder={% if current_user.country %} {{ current_user.country }} {% else %}"Country"{% endif %} class="form-control">
+        </div>
+        <div class="form-group">
+          <input type=text name=zipcode placeholder={% if current_user.zipcode %} {{ current_user.zipcode }} {% else %}"Zip Code"{% endif %} class="form-control">
+        </div>
+        <div class="form-group">
           <input type=textarea name=bio type="text" placeholder={% if current_user.bio %} {{ current_user.bio }} {% else %}"Tell us about yourself!"{% endif %} class="form-control">
         </div>
         <div class="form-group">
