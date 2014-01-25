@@ -1,23 +1,39 @@
 {% extends "layout.html" %}
 {% block body %}
 	<!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
-    <div class="container" style="padding-top: 30px;">
-      <h1>Dashboard</h1>
-	    <div class="container signup_form_wrapper">
-	    For fun let's see who your members of Congress are!<br>
-      	<table>
-        {% for member in data['results'] %}
-            <tr><td><h1>{{ member["title"] }} {{ member["first_name"] }} {% if member["middle_name"] %}{{ member["middle_name"] }}{% endif %}{{ member["last_name"] }} {% if member["name_suffix"] %}{{ member["name_suffix"] }}{% endif %}</h1></td></tr>
-      		{% for item in keyPreferredOrder %}
-            <tr><td><strong>{{ keyLookup(item) }}: </strong>{{ member[item] }}</td></tr>
-          {% endfor %}
-      	{% endfor %}
-        </table>
-	    </div>
-    </div>
+  <div class="container" style="padding-top: 30px;">
   </div>
-
-  <div class="container">
+  <div class="dashboard">
+    <div class="row">
+      <div class="col-md-2 dashboard-menu"> <!-- Dashboard Menu -->
+        <a href="vote" class="btn-lg dashboard-menu-button"><span class="glyphicon glyphicon-ok-sign"></span><span class="tab" />Go Vote</a>
+        <a href="votingrecord" class="btn-lg dashboard-menu-button"><span class="glyphicon glyphicon-list"></span><span class="tab" />My Voting History</a>
+        <a href="compatibility" class="btn-lg dashboard-menu-button"><span class="glyphicon glyphicon-list-alt"></span><span class="tab" />Compatibility List</a>
+      </div>
+      <div class="col-md-1 border-vertical"></div>
+      <div class="col-md-5 timeline"> <!-- Timeline -->
+        Stuff...<br><br>
+        Stuff...<br><br>
+      </div>
+      <div class="col-md-1 border-vertical"></div>
+      <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
+        <div class="well well-sm congress-badge">
+          <div class="media">
+            <img class="img-rounded media-object pull-left" src="http://bioguide.congress.gov/bioguide/photo/D/D000191.jpg">
+            <div class="media-body">
+              <div class="media-body pull-left">
+                <h4 class="media-heading"><strong>Rep Peter A. DeFazio</strong> <span class="tab congress-badge-blue">D</span> <span class="congress-badge-info">- OR</span></h4>
+                <p><span class="congress-badge-info">Term:</span> Jan 3rd, 2013 - Jan 3rd, 2015<br>
+                <span class="congress-badge-info">District:</span> 4<br>
+                <span class="label label-info">Voting Record</span></p>
+              </div>
+              <div class="media-body pull-right">
+                <div class="congress-badge-compatability text-success">80%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}

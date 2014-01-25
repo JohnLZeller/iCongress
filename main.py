@@ -34,19 +34,29 @@ class User(UserMixin, db.Model):
     firstname = db.Column(db.Unicode(40))
     lastname = db.Column(db.Unicode(40))
     date_register = db.Column(db.Integer)
+    address = db.Column(db.Unicode(1000))
+    city = db.Column(db.Unicode(200))
+    state = db.Column(db.Unicode(100))
+    country = db.Column(db.Unicode(50))
+    zipcode = db.Column(db.Integer)
     bio = db.Column(db.Text)
     facebook = db.Column(db.Unicode(1000))
     twitter = db.Column(db.Unicode(1000))
     website = db.Column(db.Unicode(1000))
     image = db.Column(db.LargeBinary)
 
-    def __init__(self, email, firstname=None, lastname=None, date_register=None, bio=None, facebook=None, twitter=None, 
-                    website=None, image=None):
+    def __init__(self, email, firstname=None, lastname=None, date_register=None, bio=None, address=None, city=None, 
+                    state=None, country=None, zipcode=None, facebook=None, twitter=None, website=None, image=None):
         self.email = email
         self.firstname = firstname
         self.lastname = lastname
         self.date_register = time.time()
         self.bio = bio
+        self.address = address
+        self.city = city
+        self.state = state
+        self.country = country
+        self.zipcode = zipcode
         self.facebook = facebook
         self.twitter = twitter
         self.website = website
@@ -180,11 +190,19 @@ def keyLookup(key):
                 'youtube_id': 'YouTube'}
     return keyDic[key]
 
+def get_lat_long(remote_addr):
+    #remote_addr = "162.210.196.172"
+    req = urllib2.urlopen("http://freegeoip.net/json/" + remote_addr)
+    return json.loads(req.read())
+
 ### Routing ###
 @app.route('/')
 def home():
     if current_user.is_authenticated():
         return render_template('dashboard.html')
+    #lat_long = get_lat_long(request.remote_addr)
+    #print "Lat: " + str(lat_long['latitude']) + " - Long: " + str(lat_long['longitude'])
+    #print lat_long
     return render_template('index.html')
 
 @app.route('/zip', methods=['GET', 'POST'])
@@ -209,6 +227,11 @@ def editprofile():
             if request.form.get('firstname') != u'': user.firstname = request.form.get('firstname')
             if request.form.get('lastname') != u'': user.lastname = request.form.get('lastname')
             if request.form.get('bio') != u'': user.bio = request.form.get('bio')
+            if request.form.get('address') != u'': user.address = request.form.get('address')
+            if request.form.get('city') != u'': user.city = request.form.get('city')
+            if request.form.get('state') != u'': user.state = request.form.get('state')
+            if request.form.get('country') != u'': user.country = request.form.get('country')
+            if request.form.get('zipcode') != u'': user.zipcode = request.form.get('zipcode')
             if request.form.get('facebook') != u'': user.facebook = request.form.get('facebook')
             if request.form.get('twitter') != u'': user.twitter = request.form.get('twitter')
             if request.form.get('website') != u'': user.website = request.form.get('website')

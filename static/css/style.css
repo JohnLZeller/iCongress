@@ -46,3 +46,97 @@
 	height: 35px;
 	width: 35px;
 }
+
+.dashboard {
+	padding-top: 30px;
+	padding-left: 42px;
+	padding-right: 42px;
+}
+
+.dashboard-menu {
+	color: black;
+	padding: 0px;
+	border-radius: 0px;
+    display: table;
+}
+
+.dashboard-menu a {
+	color: black;
+}
+
+.dashboard-menu-button {
+	background: transparent;
+	border: none;
+	font-size: 12pt;
+	line-height: 1.5;
+	padding: 10px;
+	border-radius: 0px;
+    display: table-row;
+}
+
+.dashboard-menu-button:hover {
+	background: transparent;
+	border: none;
+	font-size: 12pt;
+	line-height: 1.5;
+	padding: 10px;
+	background: #999999;
+	text-decoration: none;
+    display: table-row;
+}
+
+.local-congress {
+	padding-right: 0px;
+}
+
+.congress-badge {
+	height: 112px;
+	background: white;
+}
+
+.congress-badge img {
+	height: 80px;
+}
+
+.congress-badge h4 {
+	padding-left: 10px;
+}
+
+.congress-badge p {
+	padding-left: 12px;
+}
+
+.congress-badge-info {
+	color: #CCCAC8;
+}
+
+.congress-badge-blue {
+	color: #3F59BF;
+}
+
+.congress-badge-red {
+	color: #CC3B3B;
+}
+
+.congress-badge-compatability {
+	padding-right: 20px;
+	font-size: 40px;
+	font-weight: bold;
+}
+
+.tab {
+	padding-left: 5px;
+}
+
+.border-vertical {
+	width: 0px;
+	padding: 0px 0px 0px 0px;
+	margin: -10px 0px 0px -2px;
+	border-left: 2px solid #000;
+	height:500px;
+}
+
+.border-horizontal {
+	border-left: 2px solid #000;
+	width: 80%;
+}

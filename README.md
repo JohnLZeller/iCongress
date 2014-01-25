@@ -23,6 +23,7 @@ python
   * [Flask-BrowserID (Mozilla Persona)](https://github.com/garbados/flask-browserid)
   * [Flask-SQLAlchemy](http://pythonhosted.org/Flask-SQLAlchemy/)
   * [Flask-Gravatar](http://pythonhosted.org/Flask-Gravatar/)
+  * [Flask-SQLAlchemy](http://pythonhosted.org/Flask-SQLAlchemy/)
 In order to install all of these dependancies run this:
 
 ```bash
