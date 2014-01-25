@@ -119,81 +119,31 @@ browserid.init_app(app)
 apiKey = "apikey=578f15b9d3a44ebb8c829860d609bba8"
 apiAddr = "http://congress.api.sunlightfoundation.com/"
 leglookup = "legislators/locate"
-keyPreferredOrder = [# Name and Title
-            #'first_name', 
-            #'middle_name', 
-            #'last_name', 
-            #'name_suffix', 
-            #'title', 
-            # Personal Info
-            'gender', 
-            'birthday', 
-            'nickname', 
-            # Congressional Info
-            'party', 
-            'chamber', 
-            'senate_class', 
-            'in_office', 
-            'state', 
-            'state_name',
-            'state_rank', 
-            'district', 
-            # Contact Info
-            'office', 
-            'phone', 
-            'fax', 
-            'website', 
-            'contact_form', 
-            'twitter_id', 
-            'facebook_id', 
-            'youtube_id',
-            # IDs
-            'crp_id', 
-            'fec_ids', 
-            'votesmart_id', 
-            'lis_id', 
-            'govtrack_id', 
-            'bioguide_id', 
-            'thomas_id', ]
 
-def keyLookup(key):
-    keyDic =   {'last_name': 'Last Name',
-                'state_name': 'State Name',
-                'office': 'Office',
-                'fax': 'Fax Number',
-                'thomas_id': 'Thomas ID',
-                'first_name': 'First Name',
-                'middle_name': 'Middle Name',
-                'district': 'District',
-                'senate_class': 'Senate Class',
-                'in_office': 'In Office',
-                'state': 'Name',
-                'crp_id': 'CRP ID',
-                'facebook_id': 'Facebook',
-                'party': 'Party',
-                'fec_ids': 'FEC IDs',
-                'votesmart_id': 'Votesmart ID',
-                'website': 'Website',
-                'lis_id': 'LIS ID',
-                'govtrack_id': 'GovTrack ID',
-                'phone': 'Phone Number',
-                'birthday': 'Birthday',
-                'nickname': 'Nickname',
-                'contact_form': 'Contact Form',
-                'bioguide_id': 'Bioguide ID',
-                'gender': 'Gender',
-                'title': 'Title',
-                'name_suffix': 'Name Suffix',
-                'twitter_id': 'Twitter',
-                'chamber': 'Chamber',
-                'state_rank': 'State Rank',
-                'youtube_id': 'YouTube'}
-    return keyDic[key]
+## Useful Dictionaries ##
+day_suffix = {'1': 'st', '2': 'nd', '3': 'rd', '4': 'th', '5': 'th', '6': 'th', '7': 'th', '8': 'th', '9': 'th', '0': 'th'}
+month_dict = {'01': 'Jan', '02': 'Feb', '03': 'March', '04': 'April', '05': 'May', '06': 'June', '07': 'July', '08': 'Aug', '09': 'Sep', 
+        '10': 'Oct', '11': 'Nov', '12': 'Dec',}
 
 def get_lat_long(remote_addr):
     #remote_addr = "162.210.196.172"
     req = urllib2.urlopen("http://freegeoip.net/json/" + remote_addr)
     return json.loads(req.read())
+
+def add_images(data):
+    for member in data['results']:
+        member['img'] = "http://bioguide.congress.gov/bioguide/photo/" + member["bioguide_id"][:1] + \
+                            "/" + member["bioguide_id"] + ".jpg"
+    return data
+
+def timestamp_prettify(timestamp):
+    year, month, day = timestamp.split("-")
+    new = month_dict[month] + " "
+    if day[0] == "0": new += day[1]
+    else: new += day
+    new += day_suffix[day[1]] + ", " + year
+    return new
+
 
 ### Routing ###
 @app.route('/')
@@ -212,8 +162,8 @@ def zip():
             req = apiAddr + leglookup + "?" + apiKey + "&zip=" + request.form.get('zipcode')
             req = urllib2.urlopen(req).read()
             data = json.loads(req)
-            pprint(data)
-        return render_template('zip.html', data=data, keyPreferredOrder=keyPreferredOrder, keyLookup=keyLookup)
+            data = add_images(data)
+        return render_template('zip.html', data=data, timestamp_prettify=timestamp_prettify)
     return render_template('index.html')
 
 @app.route('/editprofile', methods=['GET', 'POST'])

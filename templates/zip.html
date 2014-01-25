@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-	<!-- Main jumbotron for a primary marketing message or call to action -->
+  <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="container" style="padding-top: 30px;">
   </div>
   <div class="dashboard">
@@ -23,22 +23,9 @@
       </div>
       <div class="col-md-1 border-vertical"></div>
       <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
-        <div class="well well-sm congress-badge">
-          <div class="media">
-            <div class="img-rounded media-object congress-badge-img pull-left" style="background-image: url('http://bioguide.congress.gov/bioguide/photo/D/D000191.jpg');"><img src="http://bioguide.congress.gov/bioguide/photo/D/D000191.jpg" /></div>
-            <div class="media-body">
-              <div class="media-body pull-left">
-                <h4 class="media-heading"><strong>Rep Peter A. DeFazio</strong> <span class="tab congress-badge-blue">D</span> <span class="congress-badge-info">- OR</span></h4>
-                <p><span class="congress-badge-info">Term:</span> Jan 3rd, 2013 - Jan 3rd, 2015<br>
-                <span class="congress-badge-info">District:</span> 4<br>
-                <span class="label label-info">Voting Record</span></p>
-              </div>
-              <div class="media-body pull-right">
-                <div class="congress-badge-compatability text-success">80%</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {% for member in data['results'] %}
+          {% include "congress_badge.html" %}
+        {% endfor %}
       </div>
     </div>
   </div>
