@@ -16,7 +16,7 @@
           <span class="glyphicon glyphicon-list-alt"></span><span class="tab" />Compatibility List
         </a>
       </div>
-      <div class="col-md-5 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+      <div class="col-md-7 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
       	<div class="timeline-labels">
 			<button type="button" class="btn btn-default">All</button>
 			<button type="button" class="btn btn-primary">Senate</button>
@@ -26,7 +26,7 @@
       	</div>
       	{% include "timeline.html" %}
       </div>
-      <div class="col-md-5 local-congress"> <!-- My Members of Congress -->
+      <div class="col-md-3 local-congress"> <!-- My Members of Congress -->
         <h3 class="text-center"><strong>My Members of Congress</strong></h3>
         <form class="form-inline zipcode" role="form" action="zip" method=post>
           <div class="form-group">
@@ -36,7 +36,7 @@
         </form>
         {% if data %}
         	{% for member in data['results'] %}
-        		{% include "congress_badge.html" %}
+        		{% include "small_congress_badge.html" %}
         	{% endfor %}
         {% else %}
         	<p>Please enter a zipcode to continue :)</p>
