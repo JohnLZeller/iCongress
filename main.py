@@ -151,7 +151,7 @@ def home():
         req = urllib2.urlopen(req).read()
         data = json.loads(req)
         data = add_images(data)
-        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify)
+        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify, firstvisit=True, email="johnlzeller@gmail.com")
     #lat_long = get_lat_long(request.remote_addr)
     return render_template('index.html')
 

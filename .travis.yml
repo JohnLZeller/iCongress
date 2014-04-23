@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.3"
+  - "2.7"
+  - "2.6"
+
+# Install Dependencies
+install:
+  - pip install Flask
+  - pip install flask-login
+  - pip install git+https://github.com/garbados/flask-browserid.git
+  - pip install Flask-Gravatar
+
+# Run Test Scripts
+script: 
+  - python test.py
