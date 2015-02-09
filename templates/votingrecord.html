@@ -1,12 +1,22 @@
 {% extends "layout.html" %}
 {% block body %}
-	<!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
-    <div class="container" style="padding-top: 30px;">
-      <h1>My Voting Record</h1>
-    </div>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
   </div>
-
-  <div class="container">
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      {% block dashboard_menu %}
+        {% include "dashboard_menu.html" %}
+      {% endblock %}
+      <div class="col-md-10 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+        {% if votes %}
+          {% for vote in votes %}
+            {% include "vote_badge.html" %}
+          {% endfor %}
+        {% else %}
+          <p>It looks like you haven't voted on anything yet! <a href="vote">Start voting!</a></p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% endblock %}

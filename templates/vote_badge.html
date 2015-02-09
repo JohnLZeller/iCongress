@@ -1,0 +1,20 @@
+<div class="well well-sm congress-badge pull-center">
+  <div class="media">
+    <div class="media-body">
+      <div class="media-body pull-left">
+        <h4 class="media-heading">
+          <strong><a href="#">vote["legislation"]["title"]</a></strong>
+        </h4>
+        <p><span class="congress-badge-info">Status: </span>vote["legislation"]["status"]<br>
+        <span class="congress-badge-info">Date You Voted:</span> vote["date"]<br>
+        <span class="congress-badge-info">Drafted: </span>vote["legislation"]["date_drafted"]<br>
+        <span class="congress-badge-info">Official For/Against: </span>vote["legislation"]["official_votes_for"] / vote["legislation"]["official_votes_against"]<br>
+        <span class="congress-badge-info">iCongress For/Against: </span>vote["legislation"]["votes_for"] / vote["legislation"]["votes_against"]<br>
+        <span class="label label-info">Recorded Votes</span></p>
+      </div>
+      <div class="media-body pull-right">
+        <div class="congress-badge-compatability text-success">{% if vote["decision"] %}Yes{% else %}No{% endif %}</div>
+      </div>
+    </div>
+  </div>
+</div>

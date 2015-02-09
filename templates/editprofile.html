@@ -3,7 +3,12 @@
 	<!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
   	<div class="container">
-      <h1>Edit Profile</h1>
+      {% if firstvisit %}
+        <h1>Welcome to iCongress!</h1>
+        <p>Before you start voting, we'd like to get to know you a bit!</p>
+      {% else %}
+        <h1>Edit Profile</h1>
+      {% endif %}
     </div>
     <div class="container signup_form_wrapper">
       <form role="form" action="editprofile" method=post>

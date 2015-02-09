@@ -1,12 +1,26 @@
 {% extends "layout.html" %}
 {% block body %}
-	<!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
-    <div class="container" style="padding-top: 30px;">
-      <h1>Your Compatibility List</h1>
-    </div>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
   </div>
-
-  <div class="container">
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      {% block dashboard_menu %}
+        {% include "dashboard_menu.html" %}
+      {% endblock %}
+      <div class="col-md-5 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+        {% if dataall %}
+          <p>For more precise compatibility scores, <a href="vote">vote on more legislation!</a></p>
+          {% for member in dataall['results'][0:10] %}
+            {% include "congress_badge.html" %}
+          {% endfor %}
+        {% else %}
+          <p>Please enter a zipcode to continue :)</p>
+        {% endif %}
+      </div>
+      {% block my_mocs %}
+        {% include "my_mocs.html" %}
+      {% endblock %}
+    </div>
   </div>
 {% endblock %}

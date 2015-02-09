@@ -43,6 +43,7 @@ class User(UserMixin, db.Model):
     facebook = db.Column(db.Unicode(1000))
     twitter = db.Column(db.Unicode(1000))
     website = db.Column(db.Unicode(1000))
+    firstvisit = db.Column(db.Boolean, default=True)
 
     def __init__(self, email, firstname=None, lastname=None, date_register=None, bio=None, address=None, city=None, 
                     state=None, country=None, zipcode=None, facebook=None, twitter=None, website=None):
@@ -62,6 +63,21 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+class Vote(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Integer)
+    legid = db.Column(db.Integer)
+    vote = db.Column(db.Boolean) # True is Yes
+    date = db.Column(db.Integer)
+
+    def __init__(self, userid, legid, vote):
+        self.userid = userid
+        self.legid = legid
+        self.decision = decision
+
+    def __repr__(self):
+        return '<Vote %r>' % self.id
 
 gravatar = Gravatar(app,
                     size=100,
@@ -142,21 +158,57 @@ def timestamp_prettify(timestamp):
     new += day_suffix[day[1]] + ", " + year
     return new
 
+def local_mocs():
+    # TODO: When url request fails, don't error out
+    req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
+    req = urllib2.urlopen(req).read()
+    data = json.loads(req)
+    data = add_images(data)
+    return data
+
+def voting_history():
+    user = get_user({"email": current_user.email})
+    votes = Vote.query.filter(
+                Vote.userid == user.id
+            ).all()
+    for vote in votes:
+        vote["legislation"] = legislation_info(vote)
+    return votes
+
+def legislation_info(vote):
+    # TODO: Grab real info
+    info = {'status': None,
+            'title': None,
+            'date_drafted': None,
+            'official_votes_for': None,
+            'official_votes_against': None,
+            'votes_for': None,
+            'votes_against': None,
+            'passed': None,
+            'link': None}
+    return info
+
 
 ### Routing ###
 @app.route('/')
 def home():
     if current_user.is_authenticated():
-        req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
-        req = urllib2.urlopen(req).read()
-        data = json.loads(req)
-        data = add_images(data)
-        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify, firstvisit=True, email="johnlzeller@gmail.com")
-    #lat_long = get_lat_long(request.remote_addr)
+        if current_user.firstvisit:
+            user = get_user({"email": current_user.email})
+            id = user.id
+            user = User.query.get(id)
+            user.firstvisit = False
+            try:
+                db.session.commit()
+            except:
+                pass # TODO: Add logging
+            return redirect('editprofile')
+        else:
+            return redirect('compatibility')
     return render_template('index.html')
 
-@app.route('/zip', methods=['GET', 'POST'])
-def zip():
+@app.route('/compatibility', methods=['GET', 'POST'])
+def compatibility():
     if current_user.is_authenticated():
         if request.method == 'POST':
             user = get_user({"email": current_user.email})
@@ -166,42 +218,38 @@ def zip():
             try:
                 db.session.commit()
             except:
-                return render_template('dashboard.html', alert_failure=True)
-            req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
-            req = urllib2.urlopen(req).read()
-            data = json.loads(req)
-            data = add_images(data)
-        return render_template('dashboard.html', data=data, timestamp_prettify=timestamp_prettify)
-    return render_template('index.html')
+                return render_template('compatibility.html', alert_failure=True)
+            #lat_long = get_lat_long(request.remote_addr)
 
-@app.route('/allcongress', methods=['GET', 'POST'])
-def allcongress():
-    if current_user.is_authenticated():
-        if request.method == 'POST':
-            user = get_user({"email": current_user.email})
-            id = user.id
-            user = User.query.get(id)
-            user.zipcode = request.form.get('zipcode')
-            try:
-                db.session.commit()
-            except:
-                return render_template('allcongress.html', alert_failure=True)
-
-        req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
-        req = urllib2.urlopen(req).read()
-        data = json.loads(req)
-        data = add_images(data)
-
+        data = local_mocs()
+        votes = voting_history()
         reqall = apiAddr + "legislators?" + apiKey + "&per_page=all"
         reqall = urllib2.urlopen(reqall).read()
         dataall = json.loads(reqall)
         dataall = add_images(dataall)
-        return render_template('allcongress.html', data=data, dataall=dataall, timestamp_prettify=timestamp_prettify)
+        return render_template('compatibility.html', data=data, dataall=dataall, timestamp_prettify=timestamp_prettify)
     return render_template('index.html')
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if current_user.is_authenticated():
+        if request.method == 'POST':
+            user = get_user({"email": current_user.email})
+            id = user.id
+            user = User.query.get(id)
+            if request.form.get('email') != u'': user.email = request.form.get('email')
+            try:
+                db.session.commit()
+            except:
+                return render_template('settings.html', alert_failure=True)
+            return render_template('settings.html', alert_success=True)
+        return render_template('settings.html')
+    return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 @app.route('/editprofile', methods=['GET', 'POST'])
 def editprofile():
     if current_user.is_authenticated():
+        firstvisit = current_user.firstvisit
         email = md5(current_user.email).hexdigest()
         if request.method == 'POST':
             user = get_user({"email": current_user.email})
@@ -222,37 +270,22 @@ def editprofile():
             try:
                 db.session.commit()
             except:
-                return render_template('editprofile.html', alert_failure=True, email=email)
-            return render_template('editprofile.html', alert_success=True, email=email)
-        return render_template('editprofile.html', email=email)
+                return render_template('editprofile.html', alert_failure=True, email=email, firstvisit=firstvisit)
+            return render_template('editprofile.html', alert_success=True, email=email, firstvisit=firstvisit)
+        return render_template('editprofile.html', email=email, firstvisit=firstvisit)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
+@app.route('/profile')
+def profile():
     if current_user.is_authenticated():
-        if request.method == 'POST':
-            user = get_user({"email": current_user.email})
-            id = user.id
-            user = User.query.get(id)
-            if request.form.get('email') != u'': user.email = request.form.get('email')
-            try:
-                db.session.commit()
-            except:
-                return render_template('settings.html', alert_failure=True)
-            return render_template('settings.html', alert_success=True)
-        return render_template('settings.html')
-    return render_template('index.html', error="Opps! You've gotta be logged in for that!")
-
-@app.route('/browse')
-def browse():
-    if current_user.is_authenticated():
-        return render_template('browse.html')
+        return render_template('profile.html', date_register = datetime.fromtimestamp(int(current_user.date_register)).strftime('%m/%d/%Y at %H:%M:%S'))
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 @app.route('/votingrecord')
 def votingrecord():
     if current_user.is_authenticated():
-        return render_template('votingrecord.html')
+        votes = voting_history()
+        return render_template('votingrecord.html', votes=votes)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 @app.route('/vote')
@@ -261,22 +294,10 @@ def vote():
         return render_template('vote.html')
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
-@app.route('/compatibility')
-def compatibility():
-    if current_user.is_authenticated():
-        return render_template('compatibility.html')
-    return render_template('index.html', error="Opps! You've gotta be logged in for that!")
-
 @app.route('/blog')
 def blog():
     if current_user.is_authenticated():
         return render_template('blog.html')
-    return render_template('index.html', error="Opps! You've gotta be logged in for that!")
-
-@app.route('/profile')
-def profile():
-    if current_user.is_authenticated():
-        return render_template('profile.html', date_register = datetime.fromtimestamp(int(current_user.date_register)).strftime('%m/%d/%Y at %H:%M:%S'))
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 ### Admin Tools ###
