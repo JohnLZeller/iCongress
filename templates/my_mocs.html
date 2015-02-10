@@ -6,8 +6,8 @@
     </div>
     <button type="submit" class="btn btn-success">Change Zip</button>
   </form>
-  {% if data %}
-  	{% for member in data['results'] %}
+  {% if lmocs %}
+  	{% for member in lmocs %}
   		{% include "congress_badge.html" %}
   	{% endfor %}
   {% else %}

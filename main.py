@@ -134,6 +134,11 @@ apiKey = "apikey=578f15b9d3a44ebb8c829860d609bba8"
 apiAddr = "http://congress.api.sunlightfoundation.com/"
 leglookup = "legislators/locate"
 
+## GovTrack Setup ##
+govAddr = "https://www.govtrack.us/api/v2/"
+currentMocs = "role?current=true&limit=600"
+specificMoc = "person/"
+
 ## Useful Dictionaries ##
 day_suffix = {'1': 'st', '2': 'nd', '3': 'rd', '4': 'th', '5': 'th', '6': 'th', '7': 'th', '8': 'th', '9': 'th', '0': 'th'}
 month_dict = {'01': 'Jan', '02': 'Feb', '03': 'March', '04': 'April', '05': 'May', '06': 'June', '07': 'July', '08': 'Aug', '09': 'Sep', 
@@ -144,13 +149,23 @@ def get_lat_long(remote_addr):
     req = urllib2.urlopen("http://freegeoip.net/json/" + remote_addr)
     return json.loads(req.read())
 
-def add_images(data):
-    for member in data['results']:
-        member['img'] = "http://bioguide.congress.gov/bioguide/photo/" + member["bioguide_id"][:1] + \
-                            "/" + member["bioguide_id"] + ".jpg"
-    return data
+def add_images(mocs):
+    for member in mocs:
+        member['img'] = moc_image(member)
+    return mocs
+
+def moc_image(member):
+    if member.get('person'):
+        bioguideid = member['person']['bioguideid']
+    elif member.get('bioguideid'):
+        bioguideid = member['bioguideid']
+
+    return "http://bioguide.congress.gov/bioguide/photo/" + bioguideid[:1] + \
+                            "/" + bioguideid + ".jpg"
 
 def timestamp_prettify(timestamp):
+    if timestamp is None:
+        return None
     year, month, day = timestamp.split("-")
     new = month_dict[month] + " "
     if day[0] == "0": new += day[1]
@@ -158,13 +173,61 @@ def timestamp_prettify(timestamp):
     new += day_suffix[day[1]] + ", " + year
     return new
 
+def all_mocs():
+    # TODO: When url request fails, don't error out
+    reqall = govAddr + currentMocs
+    reqall = urllib2.urlopen(reqall).read()
+    dataall = json.loads(reqall)
+    mocs = dataall['objects']
+    mocs = add_images(mocs)
+
+    for moc in mocs:
+        moc['titlename'] = moc['person']['name'].split(' ')[0] + ' ' + moc['person']['firstname']
+        if moc['person']['middlename']:
+            moc['titlename'] += ' ' + moc['person']['middlename']
+        moc['titlename'] += ' ' + moc['person']['lastname']
+    # Each MoC has these keys
+    # [u'senator_rank', u'congress_numbers', u'id', u'startdate', u'senator_class_label', 
+    # u'district', u'title', u'title_long', u'current', u'state', u'party', u'leadership_title', 
+    # u'website', u'description', u'phone', u'role_type', u'role_type_label', u'enddate', 
+    # u'senator_rank_label', u'person', u'caucus', u'senator_class']
+
+    return mocs
+
 def local_mocs():
     # TODO: When url request fails, don't error out
     req = apiAddr + leglookup + "?" + apiKey + "&zip=" + unicode(current_user.zipcode)
     req = urllib2.urlopen(req).read()
-    data = json.loads(req)
-    data = add_images(data)
-    return data
+    lmocs = json.loads(req)['results']
+
+    # Grab mocs from govtrack
+    for i, lmoc in enumerate(lmocs):
+        reqlmoc = govAddr + specificMoc + lmoc['govtrack_id']
+        reqlmoc = urllib2.urlopen(reqlmoc).read()
+        reqlmoc = json.loads(reqlmoc)
+        lmocs[i] = reqlmoc
+
+        # Add standard keys expected by congress badge template
+        lmocs[i]['person'] = {'bioguideid': lmocs[i]['bioguideid']}
+        current_role = lmocs[i]['roles'][-1]
+        lmocs[i]['party'] = current_role['party']
+        lmocs[i]['startdate'] = current_role['startdate']
+        lmocs[i]['enddate'] = current_role['enddate']
+        lmocs[i]['district'] = current_role['district']
+        lmocs[i]['state'] = current_role['state']
+        lmocs[i]['senator_rank_label'] = current_role.get('senator_rank')
+        if lmocs[i]['senator_rank_label']:
+            lmocs[i]['senator_rank_label'] = lmocs[i]['senator_rank_label'].title()
+
+        # Add titlename key
+        lmocs[i]['titlename'] = lmocs[i]['name'].split(' ')[0] + ' ' + lmocs[i]['firstname']
+        if lmocs[i]['middlename']:
+            lmocs[i]['titlename'] += ' ' + lmocs[i]['middlename']
+        lmocs[i]['titlename'] += ' ' + lmocs[i]['lastname']
+
+    lmocs = add_images(lmocs)
+    
+    return lmocs
 
 def voting_history():
     user = get_user({"email": current_user.email})
@@ -179,7 +242,7 @@ def legislation_info(vote):
     # TODO: Grab real info
     info = {'status': None,
             'title': None,
-            'date_drafted': None,
+            'introduced_on': None,
             'official_votes_for': None,
             'official_votes_against': None,
             'votes_for': None,
@@ -187,6 +250,41 @@ def legislation_info(vote):
             'passed': None,
             'link': None}
     return info
+
+def congressional_legislation(bill_id=None):
+    # TODO: When url request fails, don't error out
+    req = apiAddr + "bills" + "?" + apiKey
+    if bill_id:
+        req += '&bill_id="' + bill_id + '"'
+    req = urllib2.urlopen(req).read()
+    data = json.loads(req)
+    results = data['results']
+    # Each bill has these keys
+    # ['last_action_at', 'introduced_on', 'committee_ids', 'congress', 
+    # 'bill_type', 'related_bill_ids', 'last_vote_at', 'short_title', 'number', 
+    # 'sponsor', 'chamber', 'official_title', 'popular_title', 'enacted_as', 'urls', 
+    # 'withdrawn_cosponsors_count', 'sponsor_id', 'history', 'last_version_on', 'bill_id', 
+    # 'cosponsors_count']
+    if bill_id:
+        return results[0]
+    else:
+        return results
+
+def moc_info(bioguide_id):
+    # TODO: When url request fails, don't error out
+    req = apiAddr + "legislators" + "?" + apiKey + "&bioguide_id=" + bioguide_id
+    req = urllib2.urlopen(req).read()
+    data = json.loads(req)
+    moc = data['results'][0]
+    moc['img'] = moc_image(moc)
+    # Each moc has these keys
+    # ['website', 'lis_id', 'last_name', 'govtrack_id', 'state_name', 'office', 'title', 
+    # 'oc_email', 'icpsr_id', 'twitter_id', 'bioguide_id', 'birthday', 'term_start', 'nickname', 
+    # 'contact_form', 'youtube_id', 'ocd_id', 'first_name', 'middle_name', 'district', 'phone', 
+    # 'gender', 'in_office', 'senate_class', 'name_suffix', 'state_rank', 'thomas_id', 'chamber', 
+    # 'state', 'term_end', 'crp_id', 'facebook_id', 'party', 'fec_ids', 'votesmart_id']   
+
+    return moc
 
 
 ### Routing ###
@@ -221,13 +319,10 @@ def compatibility():
                 return render_template('compatibility.html', alert_failure=True)
             #lat_long = get_lat_long(request.remote_addr)
 
-        data = local_mocs()
+        lmocs = local_mocs()
         votes = voting_history()
-        reqall = apiAddr + "legislators?" + apiKey + "&per_page=all"
-        reqall = urllib2.urlopen(reqall).read()
-        dataall = json.loads(reqall)
-        dataall = add_images(dataall)
-        return render_template('compatibility.html', data=data, dataall=dataall, timestamp_prettify=timestamp_prettify)
+        mocs = all_mocs()
+        return render_template('compatibility.html', mocs=mocs, lmocs=lmocs, timestamp_prettify=timestamp_prettify)
     return render_template('index.html')
 
 @app.route('/settings', methods=['GET', 'POST'])
@@ -281,6 +376,18 @@ def profile():
         return render_template('profile.html', date_register = datetime.fromtimestamp(int(current_user.date_register)).strftime('%m/%d/%Y at %H:%M:%S'))
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
+@app.route('/bill/<billID>')
+def bill(billID):
+    if current_user.is_authenticated():
+        bill = congressional_legislation(billID)
+        member = moc_info(bill['sponsor_id'])
+        bill['related_bills'] = []
+        for i, rel_id in enumerate(bill['related_bill_ids']):
+            bill_info = congressional_legislation(rel_id)
+            bill['related_bills'].append(bill_info)
+        return render_template('bill.html', bill=bill, member=member, timestamp_prettify=timestamp_prettify)
+    return render_template('index.html', error="Opps! You've gotta be logged in for that!")
+
 @app.route('/votingrecord')
 def votingrecord():
     if current_user.is_authenticated():
@@ -291,7 +398,8 @@ def votingrecord():
 @app.route('/vote')
 def vote():
     if current_user.is_authenticated():
-        return render_template('vote.html')
+        legislation = congressional_legislation()
+        return render_template('vote.html', legislation=legislation)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 
 @app.route('/blog')
@@ -307,6 +415,8 @@ def show_db():
     for user in db.session.query(User):
         users.append(dict(id=user.id, email=user.email, fisrtname=user.firstname, lastname=user.lastname, date_register=user.date_register))
     return render_template('show_db.html', users=users)
+
+app.add_url_rule('/bills/<billID>', view_func=bill, methods=['GET'])
 
 
 if __name__ == '__main__':

@@ -4,13 +4,16 @@
     <div class="media-body">
       <div class="media-body pull-left">
         <h4 class="media-heading">
-          <strong><a href="#">{{ member["title"] }} {{ member["first_name"] }} {% if member["middle_name"] %}{{ member["middle_name"] }} {% endif %}{{ member["last_name"] }} {% if member["name_suffix"] %}{{ member["name_suffix"] }}{% endif %}</a></strong>
-          <span class="tab congress-badge-blue">{{ member["party"] }}</span>
+          <strong><a href="moc/{{ member['person']['bioguideid'] }}">{{ member['titlename'] }}</a></strong>
+          <span class="tab 
+            {% if member["party"][:1] == "D" %}congress-badge-blue
+            {% elif member["party"][:1] == "R" %}congress-badge-red
+            {% else %}congress-badge-else{% endif %}">{{ member["party"][:1] }}</span>
           <span class="congress-badge-info">- {{ member["state"] }}</span>
         </h4>
-        <p><span class="congress-badge-info">Term:</span> {{ timestamp_prettify(member["term_start"]) }} - {{ timestamp_prettify(member["term_end"]) }}<br>
-        <span class="congress-badge-info">{% if member["state_rank"] %}Rank: </span>{{ member["state_rank"].capitalize() }}{% elif member["district"] %}District: </span>{{ member["district"] }}{% endif %}<br>
-        <span class="label label-info">Voting Record</span></p>
+        <p><span class="congress-badge-info">Term:</span> {{ timestamp_prettify(member["startdate"]) }} - {{ timestamp_prettify(member["enddate"]) }}<br>
+        <span class="congress-badge-info">{% if member["senator_rank_label"] %}Rank: </span>{{ member["senator_rank_label"] }}{% elif member["district"] %}District: </span>{{ member["district"] }}{% endif %}<br>
+        <a href="moc/{{ member['person']['bioguideid'] }}/votes"><span class="label label-info">Voting Record</span></p></a>
       </div>
       <div class="media-body pull-right">
         <div class="congress-badge-compatability text-success">80%</div>

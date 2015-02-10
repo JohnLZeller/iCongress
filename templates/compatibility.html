@@ -9,9 +9,9 @@
         {% include "dashboard_menu.html" %}
       {% endblock %}
       <div class="col-md-5 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
-        {% if dataall %}
+        {% if mocs %}
           <p>For more precise compatibility scores, <a href="vote">vote on more legislation!</a></p>
-          {% for member in dataall['results'][0:10] %}
+          {% for member in mocs[0:10] %}
             {% include "congress_badge.html" %}
           {% endfor %}
         {% else %}

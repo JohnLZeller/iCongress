@@ -357,6 +357,10 @@ body{height:100%}
 	color: #CC3B3B;
 }
 
+.congress-badge-other {
+    color: #7D26CD;
+}
+
 .congress-badge-compatability {
 	padding-right: 20px;
 	font-size: 40px;

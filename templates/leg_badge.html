@@ -1,0 +1,19 @@
+<div class="well well-sm congress-badge pull-center">
+  <div class="media">
+    <div class="media-body">
+      <div class="media-body pull-left">
+        <h4 class="media-heading">
+          <strong><a href="bill/{{ leg['bill_id'] }}">{{ leg["official_title"] }}</a></strong>
+        </h4>
+        <p><span class="congress-badge-info">Active: </span>{{ leg["history"]["active"] }}<br>
+        <span class="congress-badge-info">Introduced: </span>{{ leg["introduced_on"] }}<br>
+        <!--<span class="congress-badge-info">Official For/Against: </span>{{ leg["official_votes_for"] }} / {{ leg["official_votes_against"] }}<br>-->
+        <a href="bill/{{ leg['bill_id'] }}"><span class="label label-info">Details</span></a>
+        <span class="label label-info">Recorded Votes</span></p>
+      </div>
+      <div class="media-body pull-right">
+        <div class="congress-badge-compatability text-success">Yes / No</div>
+      </div>
+    </div>
+  </div>
+</div>

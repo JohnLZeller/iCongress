@@ -1,12 +1,22 @@
 {% extends "layout.html" %}
 {% block body %}
-	<!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
-    <div class="container" style="padding-top: 30px;">
-      <h1>Vote!</h1>
-    </div>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
   </div>
-
-  <div class="container">
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      {% block dashboard_menu %}
+        {% include "dashboard_menu.html" %}
+      {% endblock %}
+      <div class="col-md-10 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+        {% if legislation %}
+          {% for leg in legislation %}
+            {% include "leg_badge.html" %}
+          {% endfor %}
+        {% else %}
+          <p>We can't seem to find any legislation for you to vote on. Try again soon!</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% endblock %}

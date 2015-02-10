@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block body %}
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="container" style="padding-top: 30px;">
+  </div>
+  <div class="dashboard">
+    <div class="row dashboard-row">
+      {% block dashboard_menu %}
+        {% include "dashboard_menu.html" %}
+      {% endblock %}
+      <div style="margin-top: -20px;" class="col-md-10 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
+        {% if bill %}
+          <h2>
+            <strong>{{ bill['bill_id'].upper() }}: {{ bill['official_title'] }}</strong>
+          </h2>
+          <!-- Active Badge -->
+          {% if bill['history']['active'] %}
+            <span class="label label-success">Active</span>
+          {% else %}
+            <span class="label label-danger">Not Active</span>
+          {% endif %}
+          <!-- Vote Status Badge -->
+          {% if not bill['last_vote_at'] %}
+            <span class="label label-danger">Not Yet Voted On</span>
+          {% elif bill['history']['awaiting_signature'] %}
+            <span class="label label-primary">Enacted - Not Yet Signed</span>
+          {% elif bill['history']['enacted'] and not bill['history']['awaiting_signature'] %}
+            <span class="label label-success">Enacted</span>
+          {% elif bill['history']['vetoes'] %}
+            <span class="label label-primary">Vetoed</span>
+          {% elif not bill['history']['enacted'] %}
+            <span class="label label-danger">Not Enacted</span>
+          {% endif %}
+          <!-- Other Data -->
+          <h4><strong>Sponsored by</strong></h4>
+            {% include "congress_badge.html" %}
+          <h5><strong>Introduced:</strong> {{ timestamp_prettify(bill['introduced_on']) }}</h5>
+          <h5><strong>Last Action:</strong> {{ timestamp_prettify(bill['last_action_at']) }}</h5> 
+          <h5><strong>Last Version:</strong> {{ timestamp_prettify(bill['last_version_on']) }}</h5> 
+          <h5><strong>Last Vote:</strong> {{ timestamp_prettify(bill['last_vote_at']) }}</h5> 
+          <h5><strong>Chamber:</strong> {{ bill['chamber'].title() }}</h5> 
+          <h5><strong>Congress:</strong> {{ bill['congress'] }}</h5> 
+          <h5><strong>URLs:</strong> {{ bill['urls'] }}</h5> 
+          <h5><strong># of Withdrawn CoSponsors:</strong> {{ bill['withdrawn_cosponsors_count'] }}</h5> 
+          <h5><strong># of CoSponsors:</strong> {{ bill['cosponsors_count'] }}</h5>
+          <p>Brief Description:</strong> {{ bill['introduced_on'] }}</p>
+          <br>
+          <h4><strong>Related Bills</strong></h4>
+          <ul>
+          {% for related_bill in bill['related_bills'] %}
+              <li><h5><a href="{{ related_bill['bill_id'] }}">{{ related_bill['official_title'] }}</a></h5></li>
+          {% endfor %}
+        {% else %}
+          <p>We can't seem to find any legislation for you to vote on. Try again soon!</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
