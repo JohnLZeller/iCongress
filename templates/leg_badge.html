@@ -9,9 +9,9 @@
         <!--<span class="congress-badge-info">Official For/Against: </span>{{ leg["official_votes_for"] }} / {{ leg["official_votes_against"] }}<br>-->
         <span style="margin-left: 10px;" class="congress-badge-info">Status: </span>{{ leg['current_status_label'] }}<br>
         {% if leg['is_alive'] %}
-          <span style="margin-left: 10px;" class="label label-success">Alive</span>
+          <span style="margin-left: 10px;" class="label label-success">Active</span>
         {% else %}
-          <span style="margin-left: 10px;" class="label label-danger">Not Alive</span>
+          <span style="margin-left: 10px;" class="label label-danger">Not Active</span>
         {% endif %}
         <a href="bill/{{ leg['id'] }}"><span class="label label-info">Details</span></a>
         <a href="bill/{{ leg['id'] }}/votes"><span class="label label-info">Recorded Votes</span></a></p>

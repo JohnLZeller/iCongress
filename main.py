@@ -210,7 +210,7 @@ def local_mocs():
         lmocs[i] = reqlmoc
 
         # Add standard keys expected by congress badge template
-        lmocs[i]['person']['bioguideid'] = lmocs[i]['bioguideid']
+        lmocs[i]['person'] = {'bioguideid': lmocs[i]['bioguideid']}
         current_role = lmocs[i]['roles'][-1]
         lmocs[i]['party'] = current_role['party']
         lmocs[i]['startdate'] = current_role['startdate']
@@ -233,13 +233,13 @@ def local_mocs():
 
 def specific_moc(govtrack_id):
     # Grabs from /person, which has a different format than /role
-    reqlmoc = govAddr + specificMoc + lmoc['govtrack_id']
+    reqlmoc = govAddr + specificMoc + str(govtrack_id)
     reqlmoc = urllib2.urlopen(reqlmoc).read()
     reqlmoc = json.loads(reqlmoc)
     moc = reqlmoc
 
     # Add standard keys expected by congress badge template
-    moc['person']['bioguideid'] =  moc['bioguideid']
+    moc['person'] = {'bioguideid': moc['bioguideid']}
     current_role = moc['roles'][-1]
     moc['party'] = current_role['party']
     moc['startdate'] = current_role['startdate']
@@ -289,14 +289,15 @@ def congressional_legislation(bill_id=None):
         req += specificBill + bill_id
     else:
         req += recentActiveBills
-    print bill_id
+
     req = urllib2.urlopen(req).read()
-    data = json.loads(req)
+    bill = json.loads(req)
 
     if bill_id:
-        return bill
-        
-    bill = data['objects']
+        for i, cosponsor in enumerate(bill['cosponsors']):
+            bill['cosponsors'][i] = specific_moc(cosponsor['id'])
+    else:
+        bill = bill['objects']
     # Each bill has these keys
     # ['last_action_at', 'introduced_on', 'committee_ids', 'congress', 
     # 'bill_type', 'related_bill_ids', 'last_vote_at', 'short_title', 'number', 
@@ -304,22 +305,6 @@ def congressional_legislation(bill_id=None):
     # 'withdrawn_cosponsors_count', 'sponsor_id', 'history', 'last_version_on', 'bill_id', 
     # 'cosponsors_count']
     return bill
-
-def moc_info(bioguide_id):
-    # TODO: When url request fails, don't error out
-    req = apiAddr + "legislators" + "?" + apiKey + "&bioguide_id=" + bioguide_id
-    req = urllib2.urlopen(req).read()
-    data = json.loads(req)
-    moc = data['results'][0]
-    moc['img'] = moc_image(moc)
-    # Each moc has these keys
-    # ['website', 'lis_id', 'last_name', 'govtrack_id', 'state_name', 'office', 'title', 
-    # 'oc_email', 'icpsr_id', 'twitter_id', 'bioguide_id', 'birthday', 'term_start', 'nickname', 
-    # 'contact_form', 'youtube_id', 'ocd_id', 'first_name', 'middle_name', 'district', 'phone', 
-    # 'gender', 'in_office', 'senate_class', 'name_suffix', 'state_rank', 'thomas_id', 'chamber', 
-    # 'state', 'term_end', 'crp_id', 'facebook_id', 'party', 'fec_ids', 'votesmart_id']   
-
-    return moc
 
 
 ### Routing ###
@@ -415,7 +400,7 @@ def profile():
 def bill(billID):
     if current_user.is_authenticated():
         bill = congressional_legislation(billID)
-        member = moc_info(bill['sponsor']['id'])
+        member = specific_moc(bill['sponsor']['id'])
         return render_template('bill.html', bill=bill, member=member, timestamp_prettify=timestamp_prettify)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 

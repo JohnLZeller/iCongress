@@ -11,47 +11,51 @@
       <div style="margin-top: -20px;" class="col-md-10 timeline-container dashboard-cell timeline-border"> <!-- Timeline -->
         {% if bill %}
           <h2>
-            <strong>{{ bill['bill_id'].upper() }}: {{ bill['official_title'] }}</strong>
+            <strong>{{ bill['title'] }}</strong>
           </h2>
           <!-- Active Badge -->
-          {% if bill['history']['active'] %}
+          {% if bill['is_alive'] %}
             <span class="label label-success">Active</span>
           {% else %}
             <span class="label label-danger">Not Active</span>
           {% endif %}
           <!-- Vote Status Badge -->
-          {% if not bill['last_vote_at'] %}
-            <span class="label label-danger">Not Yet Voted On</span>
-          {% elif bill['history']['awaiting_signature'] %}
-            <span class="label label-primary">Enacted - Not Yet Signed</span>
-          {% elif bill['history']['enacted'] and not bill['history']['awaiting_signature'] %}
+          {% if bill['current_status'] == 'enacted_signed' %}
             <span class="label label-success">Enacted</span>
-          {% elif bill['history']['vetoes'] %}
-            <span class="label label-primary">Vetoed</span>
-          {% elif not bill['history']['enacted'] %}
-            <span class="label label-danger">Not Enacted</span>
+          {% elif bill['current_status'] == 'pass_bill' or
+                  'passed_simpleres' in bill['current_status'] or 
+                  'passed_concurrentres' in bill['current_status'] %}
+            <span class="label label-success">Passed</span>
+          {% elif bill['current_status'] == 'prov_kill_cloturefailed' or 
+                  'failed' in bill['current_status'] %}
+            <span class="label label-danger">Failed</span>
+          {% elif 'veto' in bill['current_status'] %}
+            <span class="label label-danger">Vetoed</span>
+          {% else %}
+            <span class="label label-info">In Progress</span>
           {% endif %}
           <!-- Other Data -->
           <h4><strong>Sponsored by</strong></h4>
             {% include "congress_badge.html" %}
-          <h5><strong>Introduced:</strong> {{ timestamp_prettify(bill['introduced_on']) }}</h5>
-          <h5><strong>Last Action:</strong> {{ timestamp_prettify(bill['last_action_at']) }}</h5> 
-          <h5><strong>Last Version:</strong> {{ timestamp_prettify(bill['last_version_on']) }}</h5> 
-          <h5><strong>Last Vote:</strong> {{ timestamp_prettify(bill['last_vote_at']) }}</h5> 
-          <h5><strong>Chamber:</strong> {{ bill['chamber'].title() }}</h5> 
+          <h5><strong>Status:</strong> {{ bill['current_status_label'] }}</h5>
+            <h5 style="margin-left: 51px;">{{ bill['current_status_description'] }}</h5>
+          <h5><strong>Introduced:</strong> {{ timestamp_prettify(bill['introduced_date']) }}</h5>
+          <h5><strong>Last Action:</strong> {{ timestamp_prettify(bill['current_status_date']) }}</h5> 
+          {% if 'house' in bill['bill_type'] %}
+            <h5><strong>Chamber:</strong> House</h5>
+          {% elif 'senate' in bill['bill_type'] %}
+            <h5><strong>Chamber:</strong> Senate</h5> 
+          {% endif %}
           <h5><strong>Congress:</strong> {{ bill['congress'] }}</h5> 
-          <h5><strong>URLs:</strong> {{ bill['urls'] }}</h5> 
-          <h5><strong># of Withdrawn CoSponsors:</strong> {{ bill['withdrawn_cosponsors_count'] }}</h5> 
-          <h5><strong># of CoSponsors:</strong> {{ bill['cosponsors_count'] }}</h5>
-          <p>Brief Description:</strong> {{ bill['introduced_on'] }}</p>
-          <br>
-          <h4><strong>Related Bills</strong></h4>
-          <ul>
-          {% for related_bill in bill['related_bills'] %}
-              <li><h5><a href="{{ related_bill['bill_id'] }}">{{ related_bill['official_title'] }}</a></h5></li>
-          {% endfor %}
+          <h5><strong>Link:</strong> {{ bill['link'] }}</h5>
+          {% if bill['cosponsors'] %}
+            <h4><strong>CoSponsors</strong></h4>
+            {% for member in bill['cosponsors'] %}
+                {% include "congress_badge.html" %}
+            {% endfor %}
+          {% endif %}
         {% else %}
-          <p>We can't seem to find any legislation for you to vote on. Try again soon!</p>
+          <p>We can't seem to find any billislation for you to vote on. Try again soon!</p>
         {% endif %}
       </div>
     </div>
