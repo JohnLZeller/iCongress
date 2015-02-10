@@ -138,6 +138,8 @@ leglookup = "legislators/locate"
 govAddr = "https://www.govtrack.us/api/v2/"
 currentMocs = "role?current=true&limit=600"
 specificMoc = "person/"
+specificBill = "bill/"
+recentActiveBills = "bill/?order_by=-current_status_date"
 
 ## Useful Dictionaries ##
 day_suffix = {'1': 'st', '2': 'nd', '3': 'rd', '4': 'th', '5': 'th', '6': 'th', '7': 'th', '8': 'th', '9': 'th', '0': 'th'}
@@ -208,7 +210,7 @@ def local_mocs():
         lmocs[i] = reqlmoc
 
         # Add standard keys expected by congress badge template
-        lmocs[i]['person'] = {'bioguideid': lmocs[i]['bioguideid']}
+        lmocs[i]['person']['bioguideid'] = lmocs[i]['bioguideid']
         current_role = lmocs[i]['roles'][-1]
         lmocs[i]['party'] = current_role['party']
         lmocs[i]['startdate'] = current_role['startdate']
@@ -228,6 +230,35 @@ def local_mocs():
     lmocs = add_images(lmocs)
     
     return lmocs
+
+def specific_moc(govtrack_id):
+    # Grabs from /person, which has a different format than /role
+    reqlmoc = govAddr + specificMoc + lmoc['govtrack_id']
+    reqlmoc = urllib2.urlopen(reqlmoc).read()
+    reqlmoc = json.loads(reqlmoc)
+    moc = reqlmoc
+
+    # Add standard keys expected by congress badge template
+    moc['person']['bioguideid'] =  moc['bioguideid']
+    current_role = moc['roles'][-1]
+    moc['party'] = current_role['party']
+    moc['startdate'] = current_role['startdate']
+    moc['enddate'] = current_role['enddate']
+    moc['district'] = current_role['district']
+    moc['state'] = current_role['state']
+    moc['senator_rank_label'] = current_role.get('senator_rank')
+    if moc['senator_rank_label']:
+        moc['senator_rank_label'] = moc['senator_rank_label'].title()
+
+    # Add titlename key
+    moc['titlename'] = moc['name'].split(' ')[0] + ' ' + moc['firstname']
+    if moc['middlename']:
+        moc['titlename'] += ' ' + moc['middlename']
+    moc['titlename'] += ' ' + moc['lastname']
+
+    moc['img'] = moc_image(moc)
+    
+    return moc
 
 def voting_history():
     user = get_user({"email": current_user.email})
@@ -253,22 +284,26 @@ def legislation_info(vote):
 
 def congressional_legislation(bill_id=None):
     # TODO: When url request fails, don't error out
-    req = apiAddr + "bills" + "?" + apiKey
+    req = govAddr
     if bill_id:
-        req += '&bill_id="' + bill_id + '"'
+        req += specificBill + bill_id
+    else:
+        req += recentActiveBills
+    print bill_id
     req = urllib2.urlopen(req).read()
     data = json.loads(req)
-    results = data['results']
+
+    if bill_id:
+        return bill
+        
+    bill = data['objects']
     # Each bill has these keys
     # ['last_action_at', 'introduced_on', 'committee_ids', 'congress', 
     # 'bill_type', 'related_bill_ids', 'last_vote_at', 'short_title', 'number', 
     # 'sponsor', 'chamber', 'official_title', 'popular_title', 'enacted_as', 'urls', 
     # 'withdrawn_cosponsors_count', 'sponsor_id', 'history', 'last_version_on', 'bill_id', 
     # 'cosponsors_count']
-    if bill_id:
-        return results[0]
-    else:
-        return results
+    return bill
 
 def moc_info(bioguide_id):
     # TODO: When url request fails, don't error out
@@ -380,11 +415,7 @@ def profile():
 def bill(billID):
     if current_user.is_authenticated():
         bill = congressional_legislation(billID)
-        member = moc_info(bill['sponsor_id'])
-        bill['related_bills'] = []
-        for i, rel_id in enumerate(bill['related_bill_ids']):
-            bill_info = congressional_legislation(rel_id)
-            bill['related_bills'].append(bill_info)
+        member = moc_info(bill['sponsor']['id'])
         return render_template('bill.html', bill=bill, member=member, timestamp_prettify=timestamp_prettify)
     return render_template('index.html', error="Opps! You've gotta be logged in for that!")
 

@@ -1,18 +1,36 @@
 <div class="well well-sm congress-badge pull-center">
   <div class="media">
     <div class="media-body">
-      <div class="media-body pull-left">
+      <div style="width: 80%" class="media-body pull-left">
         <h4 class="media-heading">
-          <strong><a href="bill/{{ leg['bill_id'] }}">{{ leg["official_title"] }}</a></strong>
+          <strong><a href="bill/{{ leg['id'] }}">{{ leg["title"] }}</a></strong>
         </h4>
-        <p><span class="congress-badge-info">Active: </span>{{ leg["history"]["active"] }}<br>
-        <span class="congress-badge-info">Introduced: </span>{{ leg["introduced_on"] }}<br>
+        <span style="margin-left: 10px;" class="congress-badge-info">Introduced: </span>{{ leg["introduced_date"] }}<br>
         <!--<span class="congress-badge-info">Official For/Against: </span>{{ leg["official_votes_for"] }} / {{ leg["official_votes_against"] }}<br>-->
-        <a href="bill/{{ leg['bill_id'] }}"><span class="label label-info">Details</span></a>
-        <span class="label label-info">Recorded Votes</span></p>
+        <span style="margin-left: 10px;" class="congress-badge-info">Status: </span>{{ leg['current_status_label'] }}<br>
+        {% if leg['is_alive'] %}
+          <span style="margin-left: 10px;" class="label label-success">Alive</span>
+        {% else %}
+          <span style="margin-left: 10px;" class="label label-danger">Not Alive</span>
+        {% endif %}
+        <a href="bill/{{ leg['id'] }}"><span class="label label-info">Details</span></a>
+        <a href="bill/{{ leg['id'] }}/votes"><span class="label label-info">Recorded Votes</span></a></p>
       </div>
       <div class="media-body pull-right">
-        <div class="congress-badge-compatability text-success">Yes / No</div>
+        {% if leg['current_status'] == 'enacted_signed' %}
+          <div style="font-size: 18pt;" class="congress-badge-compatability text-success">Enacted</div>
+        {% elif leg['current_status'] == 'pass_bill' or
+                'passed_simpleres' in leg['current_status'] or 
+                'passed_concurrentres' in leg['current_status'] %}
+          <div style="font-size: 18pt;" class="congress-badge-compatability text-success">Passed</div>
+        {% elif leg['current_status'] == 'prov_kill_cloturefailed' or 
+                'failed' in leg['current_status'] %}
+          <div style="font-size: 18pt;" class="congress-badge-compatability text-danger">Failed</div>
+        {% elif 'veto' in leg['current_status'] %}
+          <div style="font-size: 18pt;" class="congress-badge-compatability text-danger">Vetoed</div>
+        {% else %}
+          <div style="font-size: 18pt;" class="congress-badge-compatability text-info">In Progress</div>
+        {% endif %}
       </div>
     </div>
   </div>
