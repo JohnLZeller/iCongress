@@ -429,7 +429,7 @@ def blog():
 def show_db():
     users = []
     for user in db.session.query(User):
-        users.append(dict(id=user.id, email=user.email, fisrtname=user.firstname, lastname=user.lastname, date_register=user.date_register))
+        users.append(dict(id=user.id, email=user.email, firstname=user.firstname, lastname=user.lastname, date_register=user.date_register))
     return render_template('show_db.html', users=users)
 
 app.add_url_rule('/bills/<billID>', view_func=bill, methods=['GET'])
